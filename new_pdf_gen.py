@@ -20,7 +20,7 @@ class NewPDF:
 
         self.pages_odd = False
 
-        self.combined()
+        #self.combined()
 
     def set_pages_odd(self):
         if self.num_pages % 2 != 0:
@@ -106,7 +106,7 @@ class NewPDF:
 
 
     def combined(self):
-        self.set_pages_odd()
+        #self.set_pages_odd()
         self.divide_pages()
         self.rearrange_pages()
         self.save_to_disk()
