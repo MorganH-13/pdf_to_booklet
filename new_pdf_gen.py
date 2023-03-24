@@ -1,10 +1,13 @@
 from PyPDF2 import PdfReader, PdfWriter
+from book import Book
 
 
 class NewPDF:
-    def __init__(self, pdf_name: str):
-        pdf_document_name = pdf_name
-        self.pdf = PdfReader(pdf_document_name)
+    def __init__(self, book: Book):
+        self.book = book
+        self.pdf_document_name = self.book.name
+        self.pdf = self.book.pdfReader
+        self.num_pages = self.book.length
 
         self.front_pdf = "front.pdf"
         self.back_pdf = "back.pdf"
@@ -15,15 +18,12 @@ class NewPDF:
         self.final_pdf = "final.pdf"
         self.final_pdf_writer = PdfWriter()
 
-        self.num_pages = len(self.pdf.pages)
-        #self.num_pages = self.pdf.getNumPages()
-
         self.pages_odd = False
 
         #self.combined()
 
     def set_pages_odd(self):
-        if self.num_pages % 2 != 0:
+        if self.book.pages % 2 != 0:
             self.pages_odd = True
             self.num_pages += 1
 
@@ -34,11 +34,11 @@ class NewPDF:
         # for back of pages for first half, take every odd num
             # for second half of pages, take every even num
         #for page in range(self.pdf.getNumPages()):
-        for page in range(len(self.pdf.pages)):
+        for page in range(self.num_pages):
             current_page = self.pdf.pages[page]
             # first half of pages
             # since the page num is 1 behind, odd and even pages are opposite
-            # 'page' in follow notes referes to real page numbers when the first number is 1
+            # 'page' in follow notes refers to real page numbers when the first number is 1
             if int(page) <= self.num_pages/2:
             #     # if page is odd, add to back pages
                 if page % 2 == 0:
@@ -97,13 +97,11 @@ class NewPDF:
         print("Back page count: ", len(self.pdf_writer_back.pages))
         print("Total final page count: ", len(self.final_pdf_writer.pages))
 
-
     def save_to_disk(self):
             # Write the data to disk
             with open(self.final_pdf, "wb") as out:
                 self.final_pdf_writer.write(out)
                 print("created total", self.final_pdf)
-
 
     def combined(self):
         #self.set_pages_odd()
