@@ -104,26 +104,29 @@ class Gui:
         printerFrame = tk.LabelFrame(section, bg='lightgrey')
 
         # Printer Frame selections
-        choices = {'A4', 'Legal'}
-        paperSize = tk.Label(printerFrame, bg='lightgrey', text='Paper Size')
-        self.dropdown = tk.StringVar(printerFrame)
-        self.dropdown.set('A4')
-        menu = tk.OptionMenu(printerFrame, self.dropdown, *choices)
+        paperChoices = {'A4', 'Legal'}
+        paperAsk = tk.Label(printerFrame, bg='lightgrey', text='Paper Size')
+        self.paperChoice = tk.StringVar(printerFrame)
+        self.paperChoice.set('A4')
+        menu = tk.OptionMenu(printerFrame, self.paperChoice, *paperChoices)
+
+        pagesChoices = {'2', '4'}
         pagesAsk = tk.Label(printerFrame, bg='lightgrey',
-                            text='Pages per face:')
-        self.pagesPer = ttk.Entry(printerFrame, width=3)
-        self.pagesPer.insert(0, '2')
-        self.pagesPer.bind('<KeyRelease>', self.update_signatures)
+                            text='Pages per face')
+        self.pageChoice = tk.StringVar(printerFrame)
+        self.pageChoice.trace('w', self.update_signatures)
+        self.pageChoice.set('2')
+        listing = tk.OptionMenu(printerFrame, self.pageChoice, *pagesChoices)
 
         # Aligning section pieces
         title.grid(row=0, column=0)
         printerFrame.grid(row=1, column=0, sticky='ew', padx=(5, 5))
 
         # Inside PrinterFrame
-        paperSize.grid(row=0, column=0)
+        paperAsk.grid(row=0, column=0)
         menu.grid(row=0, column=1)
         pagesAsk.grid(row=1, column=0)
-        self.pagesPer.grid(row=1, column=1)
+        listing.grid(row=1, column=1)
 
     def build_generator(self):
         w = 200
@@ -161,7 +164,7 @@ class Gui:
     def update_signatures(self, *args):
         if self.book:
             sigSize = self.signatureLength.get()
-            pages = self.pagesPer.get()
+            pages = self.pageChoice.get()
             if sigSize == '':
                 return
             if pages == '':
@@ -172,7 +175,7 @@ class Gui:
                 count = float(self.book.length) / (int(sigSize)*4)
                 count = int(math.floor(count))
                 remainder = self.book.length % (int(sigSize)*4)
-                self.signatureCount.configure(text='%s signatures and %s sheet(s)' %
+                self.signatureCount.configure(text='%s signatures and %s page(s)' %
                                                    (count, remainder))
                 self.sheetCount.configure(text='%s total sheets' % self.book.sheets)
                 self.book.signatures = count
