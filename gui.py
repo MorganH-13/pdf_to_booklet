@@ -4,6 +4,8 @@ from tkinter import ttk, filedialog as fd
 from new_pdf_gen import NewPDF
 from book import Book
 
+from temp_gen import PDF
+
 
 class Gui:
     def __init__(self):
@@ -74,7 +76,7 @@ class Gui:
         signatureAsk = tk.Label(signatureFrame, bg='lightgrey',
                                 text='Sheets per signature:')
         self.signatureLength = ttk.Entry(signatureFrame, width=3)
-        self.signatureLength.insert(0, '1')
+        self.signatureLength.insert(0, '4')
         self.signatureLength.bind('<KeyRelease>', self.update_signatures)
         self.signatureCount = tk.Label(signatureFrame, bg='lightgrey',
                                        text='No sections generated')
@@ -133,11 +135,13 @@ class Gui:
         h = 130
         section = tk.Frame(self.root, bg='lightgrey', width=w, height=h)
         section.grid(row=1, column=1)
+        section.grid_propagate(False)
 
         # Section widget building
         confirmButton = tk.Button(section, bg='lightgrey',
-                                  text='Save PDF Docs')
-        self.display = tk.Label(section, bg='lightgrey')
+                                  text='Save PDF Docs',
+                                  command=lambda: self.gen_signatures())
+        confirmButton.grid(row=0, column=0)
 
     def file_select(self):
         try:
@@ -171,15 +175,21 @@ class Gui:
                 return
             try:
                 self.book.pagesPer = int(pages)
+                self.book.sigSize = int(sigSize)
                 self.book.update()
+                self.sheetCount.configure(text='%s total sheets' % self.book.sheets)
+
                 count = float(self.book.length) / (int(sigSize)*4)
                 count = int(math.floor(count))
                 remainder = self.book.length % (int(sigSize)*4)
                 self.signatureCount.configure(text='%s signatures and %s page(s)' %
                                                    (count, remainder))
-                self.sheetCount.configure(text='%s total sheets' % self.book.sheets)
                 self.book.signatures = count
                 self.book.extraPages = remainder
             except ValueError:
                 self.valid = False
                 pass
+
+    def gen_signatures(self):
+        if self.book:
+            PDF(self.book)

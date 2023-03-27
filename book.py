@@ -11,11 +11,18 @@ class Book:
         self.width = self.pdfReader.pages[0].mediabox.width
         self.height = self.pdfReader.pages[0].mediabox.height
         self.pagesPer = 2  # Pages per face
-        self.sheets = int(math.ceil(self.length/(2*self.pagesPer)))
+        self.sheets = math.ceil(self.length/(2*self.pagesPer))
 
         self.signatures = 0
+        self.sigSize = 0
         self.extraPages = 0
 
-    def update(self):
-        self.sheets = int(math.ceil(self.length/(2*self.pagesPer)))
+        self.sig_front = None
+        self.sig_back = None
 
+    def update(self):
+        self.sheets = math.ceil(self.length/(2*self.pagesPer))
+
+    def set_signatures(self, front: [], back: []):
+        self.sig_front = front[:]
+        self.sig_back = back[:]
