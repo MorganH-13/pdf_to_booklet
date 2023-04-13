@@ -1,10 +1,12 @@
 import math
+from PyPDF2 import PaperSize
 import tkinter as tk
 from tkinter import ttk, filedialog as fd
 from new_pdf_gen import NewPDF
 from book import Book
 
 from temp_gen import PDF
+from PyMuGen import Formatter
 
 
 class Gui:
@@ -109,6 +111,7 @@ class Gui:
         paperChoices = {'A4', 'Legal'}
         paperAsk = tk.Label(printerFrame, bg='lightgrey', text='Paper Size')
         self.paperChoice = tk.StringVar(printerFrame)
+        self.paperChoice.trace('w', self.update_signatures)
         self.paperChoice.set('A4')
         menu = tk.OptionMenu(printerFrame, self.paperChoice, *paperChoices)
 
@@ -169,6 +172,14 @@ class Gui:
         if self.book:
             sigSize = self.signatureLength.get()
             pages = self.pageChoice.get()
+
+            if self.paperChoice.get() == 'A4':
+                self.book.height = 842
+                self.book.width = 595
+            if self.paperChoice.get() == 'Legal':
+                self.book.height = 1008
+                self.book.width = 612
+
             if sigSize == '':
                 return
             if pages == '':
@@ -189,7 +200,9 @@ class Gui:
             except ValueError:
                 self.valid = False
                 pass
+            self.update_input()
 
     def gen_signatures(self):
         if self.book:
-            PDF(self.book)
+            pymu_test = Formatter(self.book)
+            pymu_test.format_pdf()
